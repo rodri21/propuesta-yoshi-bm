@@ -10,7 +10,6 @@ import {
   QrCode,
   Bike,
   Store,
-  Bell,
   CheckCircle2,
   Clock3,
   Search,
@@ -117,7 +116,7 @@ const flowCatalog = [
   {
     id: "marketplace",
     title: "Flujo 2 · Tab Alimentos / Marketplace",
-    subtitle: "Exploración por evento con concesiones, promos y carrito propio",
+    subtitle: "Nueva tab en el menu principal a modo de marketplace con carrito por venue",
     icon: UtensilsCrossed,
     accent: "from-emerald-500 to-teal-500",
     summary:
@@ -133,7 +132,7 @@ const flowCatalog = [
             <EventAccessCard title="Chivas vs América" detail="15 Abr · Akron Stadium" seat="Sec 101 · Fila A · 5-6" />
             <EventAccessCard title="Metallica en Foro Sol" detail="22 Abr · Foro Sol" seat="Zona A · General" />
             <SectionTag>Tus órdenes activas</SectionTag>
-            <MiniStatusCard title="Orden #YOS-4821" subtitle="Pagada · 2 productos pendientes" />
+            <MiniStatusCard title="Orden #ORD-4821" subtitle="Pagada · 2 productos pendientes" />
           </div>
         ),
       },
@@ -170,10 +169,10 @@ const flowCatalog = [
             <PriceResume
               rows={[
                 ["Subtotal", "$335"],
-                ["Promo 2x1", "-$120"],
-                ["Tokens (10)", "-$240"],
+                ["Promo 2x1 hot dogs", "-$120"],
+                ["Tokens (5)", "-$95"],
               ]}
-              total="$0.00"
+              total="$120.00"
             />
             <PaymentCard />
           </div>
@@ -196,9 +195,14 @@ const flowCatalog = [
         title: "Mis órdenes",
         body: (
           <div className="space-y-3">
-            <MiniStatusCard title="Orden #YOS-4821" subtitle="Pagada · Pendiente de canje" />
-            <LineItem title="2x Hot Dog Especial" subtitle="pendiente" value="" />
-            <LineItem title="1x Cerveza Nacional" subtitle="pendiente" value="" />
+            <OrderWithProducts
+              order="Orden #ORD-4821"
+              status="Pagada · Pendiente de canje"
+              products={[
+                { name: "Hot Dogs El Príncipe — 2x Hot Dog Especial", detail: "pendiente" },
+                { name: "Cervecería Central — 1x Cerveza Nacional", detail: "pendiente" },
+              ]}
+            />
             <QrBlock label="Mostrar QR para recoger" />
             <Button className="w-full rounded-2xl">Que me traigan a mi asiento</Button>
           </div>
@@ -210,7 +214,7 @@ const flowCatalog = [
         title: "Terminal Yoshi · Escaneo QR",
         body: (
           <div className="space-y-3">
-            <InfoRow label="Orden" value="#YOS-4821" />
+            <InfoRow label="Orden" value="#ORD-4821" />
             <InfoRow label="Cliente" value="Juan Pérez" />
             <InfoRow label="Evento" value="Chivas vs América" />
             <CheckList
@@ -267,14 +271,14 @@ const flowCatalog = [
             <PriceResume rows={[["Cargo delivery", "$30"]]} total="$30" />
             <PaymentCard cash />
             <Button className="w-full rounded-2xl">Confirmar delivery</Button>
-            <SmallNote text="Máximo 5 productos por viaje y 4 viajes por orden." />
+            <SmallNote text="Se cobra un cargo fijo por cada viaje de delivery." />
           </div>
         ),
       },
       {
         id: "tracking",
         label: "Tracking en tiempo real",
-        title: "Orden #YOS-4821",
+        title: "Orden #ORD-4821",
         body: (
           <div className="space-y-3">
             <TrackingStep label="Solicitud recibida" done />
@@ -292,14 +296,11 @@ const flowCatalog = [
         title: "Runner · Delivery #D-1042",
         body: (
           <div className="space-y-3">
-            <InfoRow label="Orden" value="#YOS-4821" />
+            <InfoRow label="Orden" value="#ORD-4821" />
             <InfoRow label="Entrega a" value="Sec 101 · Fila A · 5-6" />
             <InfoRow label="Código" value="4821" />
             <CashCharge />
-            <div className="grid grid-cols-2 gap-2">
-              <Button className="rounded-2xl">Entregado y cobrado</Button>
-              <Button variant="outline" className="rounded-2xl">No encontrado</Button>
-            </div>
+            <Button className="w-full rounded-2xl">Entregado y cobrado</Button>
           </div>
         ),
       },
@@ -346,26 +347,16 @@ export default function YoshiBoletomovilPrototype() {
         <div className="mb-8 grid gap-4 lg:grid-cols-[1.2fr_.8fr]">
           <div>
             <Badge className="mb-3 rounded-full bg-white/10 px-4 py-1 text-white hover:bg-white/10">
-              Prototipo front · Demo interactiva
+              Prototipo · Demo interactiva
             </Badge>
             <h1 className="text-3xl font-semibold tracking-tight sm:text-5xl">
               Yoshi × Boletomóvil
             </h1>
             <p className="mt-3 max-w-3xl text-sm text-slate-300 sm:text-base">
-              Una demo visual para presentar los principales recorridos del usuario: agregar alimentos en checkout,
+              Demo visual de los principales recorridos del usuario: agregar alimentos en checkout,
               usar la nueva tab de marketplace, canjear con QR y pedir delivery al asiento.
             </p>
           </div>
-          <Card className="border-white/10 bg-white/5 text-white shadow-2xl shadow-black/30 backdrop-blur">
-            <CardContent className="p-5">
-              <div className="grid gap-3 sm:grid-cols-2">
-                <Metric label="Flujos principales" value="4" />
-                <Metric label="Pantallas simuladas" value="12" />
-                <Metric label="Modo" value="Solo front" />
-                <Metric label="Objetivo" value="Presentación" />
-              </div>
-            </CardContent>
-          </Card>
         </div>
 
         <AnimatePresence mode="wait">
@@ -377,6 +368,8 @@ export default function YoshiBoletomovilPrototype() {
               exit={{ opacity: 0, y: -12 }}
               className="space-y-6"
             >
+              <ProposalSummary />
+
               <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
                 {flowCatalog.map((flow, index) => {
                   const Icon = flow.icon;
@@ -417,31 +410,8 @@ export default function YoshiBoletomovilPrototype() {
                 })}
               </div>
 
-              <div className="grid gap-5 lg:grid-cols-[1.1fr_.9fr]">
-                <Card className="rounded-[28px] border-white/10 bg-white/5 text-white">
-                  <CardHeader>
-                    <CardTitle>Cómo usar esta demo</CardTitle>
-                  </CardHeader>
-                  <CardContent className="grid gap-3 text-sm text-slate-300 md:grid-cols-2">
-                    <GuideRow icon={Ticket} title="Checkout" text="Muestra la venta conjunta antes del pago." />
-                    <GuideRow icon={UtensilsCrossed} title="Marketplace" text="Explica la tab Alimentos por evento." />
-                    <GuideRow icon={QrCode} title="QR / Canje" text="Aterriza el modelo de voucher y canje parcial." />
-                    <GuideRow icon={Bike} title="Delivery" text="Resume logística, cargo y tracking del runner." />
-                  </CardContent>
-                </Card>
+              <ImplementationRequirements />
 
-                <Card className="rounded-[28px] border-white/10 bg-white/5 text-white">
-                  <CardHeader>
-                    <CardTitle>Mensajes clave</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3 text-sm text-slate-300">
-                    <Bullet>La comanda no se genera al pagar; se genera al canjear o pedir delivery.</Bullet>
-                    <Bullet>Un boleto activo desbloquea el marketplace del venue.</Bullet>
-                    <Bullet>Un solo QR puede manejar una orden multi-producto y canje parcial.</Bullet>
-                    <Bullet>El delivery se gestiona por viaje con tracking y validaciones visibles.</Bullet>
-                  </CardContent>
-                </Card>
-              </div>
             </motion.div>
           ) : (
             <motion.div
@@ -455,7 +425,7 @@ export default function YoshiBoletomovilPrototype() {
                 <CardHeader>
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <Button variant="ghost" onClick={goBack} className="-ml-3 mb-2 rounded-2xl text-slate-300 hover:text-white">
+                      <Button variant="ghost" onClick={goBack} className="-ml-3 mb-2 rounded-2xl text-slate-300 hover:bg-white/10 hover:text-white">
                         <ArrowLeft className="mr-2 h-4 w-4" /> Volver a flujos
                       </Button>
                       <CardTitle className="text-2xl">{activeFlow.title}</CardTitle>
@@ -481,7 +451,7 @@ export default function YoshiBoletomovilPrototype() {
                         onClick={() => setScreenIndex(idx)}
                         className={`w-full rounded-2xl border p-4 text-left transition ${
                           idx === screenIndex
-                            ? "border-white/20 bg-white/10"
+                            ? "border-emerald-500/40 bg-emerald-500/10"
                             : "border-white/10 bg-white/0 hover:bg-white/5"
                         }`}
                       >
@@ -492,7 +462,7 @@ export default function YoshiBoletomovilPrototype() {
                   </div>
 
                   <div className="grid grid-cols-2 gap-2">
-                    <Button variant="outline" onClick={prevScreen} className="rounded-2xl border-white/15 bg-transparent text-white hover:bg-white/5">
+                    <Button variant="outline" onClick={prevScreen} className="rounded-2xl border-white/20 bg-transparent text-white hover:bg-white/10 hover:text-white">
                       Anterior
                     </Button>
                     <Button onClick={nextScreen} className="rounded-2xl">
@@ -513,23 +483,17 @@ export default function YoshiBoletomovilPrototype() {
                       <CardTitle>{activeScreen?.label}</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4 text-sm text-slate-300">
-                      <p>
-                        Esta vista simula cómo se vería la interacción dentro de la app o del ecosistema operativo
-                        relacionado al flujo seleccionado.
-                      </p>
                       <NarrativeBlock flowId={activeFlow.id} screenId={activeScreen?.id} />
                     </CardContent>
                   </Card>
 
                   <Card className="rounded-[28px] border-white/10 bg-white/5 text-white">
                     <CardHeader>
-                      <CardTitle>Reglas que conviene remarcar en la presentación</CardTitle>
+                      <CardTitle>Justificacion tecnica</CardTitle>
+                      <p className="text-sm text-slate-400">Como se mapea este flujo a la arquitectura existente de Yoshi</p>
                     </CardHeader>
-                    <CardContent className="grid gap-3 md:grid-cols-2">
-                      <Rule title="Voucher vs comanda" text="El pago crea una orden pendiente; la cocina solo trabaja sobre canje o delivery." />
-                      <Rule title="Canje parcial" text="El QR permanece activo mientras existan productos pendientes." />
-                      <Rule title="Delivery por viaje" text="Cada solicitud puede tener límite de productos y un cargo independiente." />
-                      <Rule title="Tokens y promos" text="El usuario puede ver el impacto del beneficio directamente en el carrito." />
+                    <CardContent className="space-y-4">
+                      <TechBlock flowId={activeFlow.id} />
                     </CardContent>
                   </Card>
                 </div>
@@ -545,24 +509,24 @@ export default function YoshiBoletomovilPrototype() {
 function NarrativeBlock({ flowId, screenId }) {
   const map = {
     checkout: {
-      "checkout-step": "Presenta el cross-sell de alimentos como un paso opcional dentro del checkout del boleto, sin romper el flujo principal.",
-      "product-detail": "Profundiza en la personalización del producto: addons, salsas, promociones automáticas y cantidad.",
-      confirmation: "Cierra con la idea clave de doble resultado: ticket digital + voucher QR de alimentos.",
+      "checkout-step": "Después de seleccionar asientos y antes de pagar, aparece este paso opcional para agregar alimentos al mismo pedido del boleto.",
+      "product-detail": "Al tocar un producto del paso anterior, se abre este detalle donde el usuario personaliza ingredientes, extras y cantidad.",
+      confirmation: "Una vez completado el pago, el usuario recibe su boleto digital y un QR de alimentos que funciona como voucher para canjear el día del evento.",
     },
     marketplace: {
-      events: "Muestra que la tab Alimentos vive como una sección independiente y se desbloquea con eventos activos del usuario.",
-      market: "Explica la navegación por concesiones, promos y productos destacados dentro del venue específico.",
-      cart: "Enfatiza cómo promociones y tokens impactan el total antes de pagar.",
+      events: "Se accede desde la nueva tab \"Alimentos\" en la barra de navegación. Muestra los eventos donde el usuario tiene boleto activo y permite entrar al marketplace de cada uno.",
+      market: "Al seleccionar un evento, el usuario entra al catálogo del venue donde puede explorar concesiones, ver promos y agregar productos al carrito.",
+      cart: "El usuario revisa su carrito antes de pagar. Aquí puede aplicar un código promo o canjear tokens para reducir el total.",
     },
     pickup: {
-      "my-order": "Aterriza el punto de partida del usuario: una orden pagada, visible y lista para recogerse o enviarse.",
-      "seller-scan": "Modela el momento operativo en la terminal Yoshi, donde el vendedor decide qué productos canjear.",
-      partial: "Refuerza el beneficio del canje parcial y la persistencia del QR para productos restantes.",
+      "my-order": "Desde \"Mis Órdenes\" en la app, el usuario ve sus órdenes pagadas con los productos pendientes. Puede mostrar el QR para recoger o pedir delivery.",
+      "seller-scan": "Cuando el usuario llega a la concesión y muestra su QR, el vendedor lo escanea en la terminal Yoshi y elige qué productos preparar en ese momento.",
+      partial: "Si el usuario solo canjeó algunos productos, los restantes siguen apareciendo como pendientes. El mismo QR se puede volver a usar para canjear después.",
     },
     delivery: {
-      "select-delivery": "Explica la selección por viaje, el cargo configurable y el método de pago del delivery.",
-      tracking: "Hace visible el seguimiento paso a paso para dar confianza al usuario durante la espera.",
-      runner: "Incluye la perspectiva operativa del runner para cerrar el ciclo completo del servicio a asiento.",
+      "select-delivery": "Desde su orden, el usuario toca \"Que me traigan a mi asiento\" y selecciona qué productos quiere recibir. Se muestra el cargo por viaje y el método de pago.",
+      tracking: "Una vez confirmado el delivery, el usuario ve el avance en tiempo real: solicitud recibida, en preparación, en camino y entregada, junto con un código de confirmación.",
+      runner: "Esta es la vista del runner en su terminal. Ve la ubicación del asiento, los productos a entregar, el código de confirmación y si debe cobrar en efectivo.",
     },
   };
 
@@ -593,9 +557,9 @@ function PhonePreview({ flow, accent }) {
 
 function PhoneFrame({ title, children }) {
   return (
-    <div className="rounded-[40px] border border-white/10 bg-slate-950 p-3 shadow-[0_40px_120px_-30px_rgba(0,0,0,0.8)]">
-      <div className="mx-auto mb-3 h-1.5 w-20 rounded-full bg-white/10" />
-      <div className="min-h-[760px] overflow-hidden rounded-[32px] border border-white/10 bg-slate-50 text-slate-950">
+    <div className="rounded-[40px] border border-sky-300/20 bg-sky-950/80 p-3 shadow-[0_0_40px_-10px_rgba(56,189,248,0.1),0_40px_120px_-30px_rgba(0,0,0,0.8)]">
+      <div className="mx-auto mb-3 h-1.5 w-20 rounded-full bg-sky-300/25" />
+      <div className="min-h-[760px] overflow-hidden rounded-[32px] border border-sky-300/15 bg-slate-50 text-slate-950">
         <div className="sticky top-0 z-10 border-b border-slate-200 bg-white/90 px-5 py-4 backdrop-blur">
           <div className="flex items-center gap-3">
             <div className="rounded-xl bg-slate-100 p-2 text-slate-700">
@@ -807,7 +771,7 @@ function OrderCard() {
         <UtensilsCrossed className="h-4 w-4" /> Tu orden de alimentos
       </div>
       <div className="space-y-1 text-sm text-slate-600">
-        <div>Orden #YOS-4821</div>
+        <div>Orden #ORD-4821</div>
         <div>Estado: Pagada · Pendiente de canje</div>
         <div>2x Hot Dog Especial</div>
         <div>1x Cerveza Nacional</div>
@@ -932,9 +896,9 @@ function TokenBox() {
     <div className="rounded-3xl border border-violet-200 bg-violet-50 p-3">
       <div className="mb-2 font-medium text-violet-950">🎟️ ¿Tienes tokens?</div>
       <div className="space-y-2 text-sm text-violet-900">
-        <div className="rounded-2xl bg-white px-3 py-2">Saldo disponible: 15 tokens</div>
-        <div className="rounded-2xl bg-white px-3 py-2">Hot Dog Especial = 5 tokens</div>
-        <div className="rounded-2xl bg-white px-3 py-2">☑ Usar 10 tokens</div>
+        <div className="rounded-2xl bg-white px-3 py-2">Saldo disponible: 10 tokens</div>
+        <div className="rounded-2xl bg-white px-3 py-2">Cerveza Nacional = 5 tokens</div>
+        <div className="rounded-2xl bg-white px-3 py-2">☑ Usar 5 tokens (1 cerveza)</div>
       </div>
     </div>
   );
@@ -1019,29 +983,254 @@ function Metric({ label, value }) {
   );
 }
 
-function GuideRow({ icon: Icon, title, text }) {
-  return (
-    <div className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/5 p-4">
-      <div className="rounded-2xl bg-white/10 p-2">
-        <Icon className="h-4 w-4" />
-      </div>
-      <div>
-        <div className="font-medium text-white">{title}</div>
-        <div className="text-slate-400">{text}</div>
-      </div>
-    </div>
-  );
-}
+
 
 function Bullet({ children }) {
   return <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">• {children}</div>;
 }
 
-function Rule({ title, text }) {
+
+function ProposalSummary() {
+  const [open, setOpen] = useState(true);
+
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-      <div className="font-medium text-white">{title}</div>
-      <div className="mt-1 text-sm text-slate-400">{text}</div>
+    <div className="mb-6">
+      <button
+        onClick={() => setOpen(!open)}
+        className="mb-4 flex w-full items-center justify-between text-left"
+      >
+        <h2 className="text-xl font-semibold text-white sm:text-2xl">Resumen de la propuesta</h2>
+        <ChevronRight className={`h-5 w-5 text-slate-400 transition ${open ? "rotate-90" : ""}`} />
+      </button>
+
+      {open && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+          <Card className="rounded-[28px] border-white/10 bg-white/5 text-white">
+            <CardContent className="p-5 sm:p-6">
+              <div className="space-y-5">
+                {/* Flujos */}
+                <div className="space-y-2 text-sm text-slate-300">
+                  <div className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Flujos</div>
+                  <div className="flex items-start gap-2">
+                    <ShoppingCart className="mt-0.5 h-4 w-4 shrink-0 text-orange-400" />
+                    <span><strong className="text-white">Checkout</strong> — al comprar boleto, el usuario puede agregar alimentos como paso opcional antes de pagar. Recibe un QR como voucher.</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <UtensilsCrossed className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" />
+                    <span><strong className="text-white">Marketplace</strong> — desde la tab "Alimentos", el usuario explora concesiones y productos del venue, arma su carrito y paga por separado.</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <QrCode className="mt-0.5 h-4 w-4 shrink-0 text-violet-400" />
+                    <span><strong className="text-white">QR y canje</strong> — el usuario muestra su QR en la concesion, el vendedor escanea y elige que productos preparar en el momento.</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Bike className="mt-0.5 h-4 w-4 shrink-0 text-sky-400" />
+                    <span><strong className="text-white">Delivery</strong> — el usuario pide que le traigan los productos a su asiento. Se cobra un cargo por viaje y un runner lo entrega con codigo.</span>
+                  </div>
+                </div>
+
+                <div className="h-px bg-white/10" />
+
+                {/* Mensajes clave */}
+                <div>
+                  <div className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Puntos clave</div>
+                  <div className="space-y-2 text-sm text-slate-300">
+                    <Bullet>Al pagar se genera un QR como voucher. La comanda en cocina no se crea hasta que el usuario canjea en la concesion o pide delivery.</Bullet>
+                    <Bullet>No es necesario recoger todo de una vez: el usuario puede canjear solo algunos productos y volver despues por el resto con el mismo QR.</Bullet>
+                    <Bullet>Cada pedido a tu asiento tiene un cargo fijo por viaje, configurable por cada concesion.</Bullet>
+                    <Bullet>El usuario aplica codigos promo o canjea tokens desde el carrito, y ve el descuento reflejado antes de pagar.</Bullet>
+                    <Bullet>Un boleto activo (comprado) desbloquea el marketplace del venue.</Bullet>
+                    <Bullet>Un solo QR puede manejar una orden con productos de varias concesiones.</Bullet>
+                  </div>
+                </div>
+
+                <div className="h-px bg-white/10" />
+
+                {/* Estados */}
+                <div className="space-y-4">
+                  <div>
+                    <div className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Estado de la orden — lo que ve el usuario (SaleProduct.status — nuevo)</div>
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <span className="rounded-full bg-slate-700 px-2.5 py-1 text-xs text-white">Pending</span>
+                      <ChevronRight className="h-3 w-3 text-slate-600" />
+                      <span className="rounded-full bg-blue-700 px-2.5 py-1 text-xs text-white">Sold</span>
+                      <span className="text-xs text-slate-600">/</span>
+                      <span className="rounded-full bg-violet-700 px-2.5 py-1 text-xs text-white">Redeemed</span>
+                      <ChevronRight className="h-3 w-3 text-slate-600" />
+                      <span className="rounded-full bg-amber-700 px-2.5 py-1 text-xs text-white">InProgress</span>
+                      <ChevronRight className="h-3 w-3 text-slate-600" />
+                      <span className="rounded-full bg-emerald-700 px-2.5 py-1 text-xs text-white">Delivered</span>
+                    </div>
+                    <p className="mt-2 text-xs text-slate-500">Sold = venta directa en POS o en persona (comanda inmediata). Redeemed = pre-orden desde BM canjeada con QR o delivery.</p>
+                  </div>
+                  <div>
+                    <div className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Estado en cocina — lo que ve el vendedor (OrderItem.status — ya existe en Yoshi)</div>
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <span className="rounded-full bg-slate-700 px-2.5 py-1 text-xs text-white">Pending</span>
+                      <ChevronRight className="h-3 w-3 text-slate-600" />
+                      <span className="rounded-full bg-amber-700 px-2.5 py-1 text-xs text-white">InProgress</span>
+                      <ChevronRight className="h-3 w-3 text-slate-600" />
+                      <span className="rounded-full bg-sky-700 px-2.5 py-1 text-xs text-white">Ready</span>
+                      <ChevronRight className="h-3 w-3 text-slate-600" />
+                      <span className="rounded-full bg-emerald-700 px-2.5 py-1 text-xs text-white">Delivered</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
     </div>
+  );
+}
+
+function OrderWithProducts({ order, status, products }) {
+  return (
+    <div className="rounded-3xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
+      <div className="mb-1 font-semibold text-slate-900">{order}</div>
+      <div className="mb-3 text-sm text-slate-500">{status}</div>
+      <div className="space-y-2">
+        {products.map((p) => (
+          <div key={p.name} className="rounded-2xl bg-slate-50 px-3 py-2.5">
+            <div className="text-sm font-medium text-slate-800">{p.name}</div>
+            <div className="text-xs text-slate-400">{p.detail}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function TechBlock({ flowId }) {
+  const content = {
+    checkout: [
+      {
+        title: "Creacion de la Sale",
+        text: "BM llama POST /sales con los productos seleccionados. Yoshi crea un registro en Sales con status pre_order (no genera Order ni comanda). Los productos se guardan en SaleProducts con sus addons y personalizaciones.",
+      },
+      {
+        title: "Pago unificado",
+        text: "El pago del boleto y los alimentos se procesa en BM. Una vez confirmado, BM registra el Payment en Yoshi vinculado a la Sale. Se soportan multiples metodos: tarjeta, QR (QRTransaction) o tokens.",
+      },
+      {
+        title: "Generacion del QR",
+        text: "Al crearse la Sale, Yoshi devuelve el uuid de la orden. BM genera un QR que codifica ese uuid. Este QR no activa cocina — funciona como voucher hasta que se canjea.",
+      },
+      {
+        title: "Promos y tokens en el carrito",
+        text: "Antes de pagar, BM valida codigos promo usando ValidationsHelper.validatePromotionCode() (hoy no hay endpoint standalone — se propone POST /promotions/validate). Para tokens, se consultan TokenAllowances para verificar saldo y ProductTokenRules para saber cuantos tokens cuesta cada producto.",
+      },
+    ],
+    marketplace: [
+      {
+        title: "Consulta del catalogo",
+        text: "BM llama GET /products filtrando por uuid del evento y concesion. Yoshi responde con productos, precios, categorias, addons disponibles y ProductTokenRules desde la vista vw_products.",
+      },
+      {
+        title: "Concesiones del venue",
+        text: "GET /concessions filtrado por uuid del venue del evento. Cada concesion tiene sus productos, tiempos estimados y configuracion de delivery (cargo por viaje).",
+      },
+      {
+        title: "Promos activas",
+        text: "GET /promotions filtrado por evento. Las promos con auto_apply se aplican automaticamente al carrito. Los codigos promo (PromotionCode) se validan en tiempo real con su usage_count vs max_per_code.",
+      },
+      {
+        title: "Tokens",
+        text: "El usuario ingresa su codigo y BM consulta GET /tokens/codes/{uuid} para obtener TokenAllowances (saldo por tipo) y cruza con ProductTokenRules de los productos en carrito. Al pagar se crean TokenRedemptions.",
+      },
+    ],
+    pickup: [
+      {
+        title: "Escaneo del QR",
+        text: "La terminal Yoshi lee el uuid del QR y llama GET /sales/{uuid}. Yoshi responde con la Sale y sus SaleProducts, cada uno con su status individual (pending, redeemed, delivered).",
+      },
+      {
+        title: "Canje parcial",
+        text: "Un nuevo endpoint POST /sales/{uuid}/orders/create-partial recibe los product_uuids seleccionados por el vendedor y llama a createFromSaleProducts(), que ya soporta recibir un subset de productos. Los no seleccionados conservan status pending.",
+      },
+      {
+        title: "Comandas por concesion",
+        text: "createFromSaleProducts() ya agrupa Orders por preparer (uno por concesion). Al pasar solo un subset de productos, cada cocina recibe unicamente los OrderItems que le corresponden.",
+      },
+      {
+        title: "Estados del OrderItem",
+        text: "Cada OrderItem sigue el flujo existente: Pending → InProgress → Ready → Delivered via PUT /orders/{uuid}. Al cambiar el status del OrderItem se sincroniza con el status del SaleProduct para que el QR refleje que productos ya fueron canjeados.",
+      },
+    ],
+    delivery: [
+      {
+        title: "Solicitud de delivery",
+        text: "BM llama POST /deliveries con el uuid de la Sale y los SaleProducts seleccionados. Yoshi crea un registro Delivery con DeliveryItems por cada producto. Se necesita agregar un campo seat_location a Deliveries para la ubicacion del asiento.",
+      },
+      {
+        title: "Generacion de comanda",
+        text: "Al crearse el Delivery, Yoshi genera automaticamente el Order (comanda) en cocina para los productos seleccionados. La cocina los ve en su monitor igual que cualquier otra comanda.",
+      },
+      {
+        title: "Asignacion del runner",
+        text: "Un runner disponible toma el Delivery desde su terminal (GET /deliveries?status=pending). Actualiza cada DeliveryItem via PUT /deliveries/{uuid}/items/{itemUuid} con el status: Pending → InTransit → Delivered.",
+      },
+      {
+        title: "Cargo por viaje",
+        text: "El cargo se registra como un Payment independiente en la Sale. Si es efectivo, el runner lo cobra al entregar y confirma en su terminal.",
+      },
+    ],
+  };
+
+  return (
+    <div className="grid gap-3 md:grid-cols-2">
+      {(content[flowId] || []).map((item) => (
+        <div key={item.title} className="rounded-2xl border border-white/10 bg-white/5 p-4">
+          <div className="mb-1 text-xs font-semibold text-white">{item.title}</div>
+          <div className="text-xs leading-relaxed text-slate-400">{item.text}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ImplementationRequirements() {
+  const items = [
+    { type: "Campo", name: "SaleProducts.status", desc: "Nuevo campo con 5 valores: Pending (pre-orden, esperando canje), Sold (venta directa en POS), Redeemed (pre-orden canjeada desde BM), InProgress (en preparacion), Delivered (entregado). Hoy solo existe status a nivel Sale." },
+    { type: "Enum", name: "SaleStatus.PreOrder (9)", desc: "Nuevo valor en el enum SaleStatus (hoy va de 0 a 8). Identifica ventas desde BM que aun no generan comanda." },
+    { type: "Campo", name: "Sales.source", desc: "Para distinguir el origen de la venta (pos, boletomovil). Uso exclusivo para analiticas y reportes." },
+    { type: "Endpoint", name: "POST /sales/{uuid}/redeem", desc: "Cuando el vendedor escanea un QR y elige que productos preparar, este endpoint recibe esa seleccion y genera la comanda en cocina solo para esos productos." },
+    { type: "Campo", name: "Concessions.delivery_fee", desc: "Cargo por viaje de delivery, configurable por cada concesion. La tabla Concessions no tiene campos de delivery actualmente." },
+    { type: "Campo", name: "Deliveries.seat_location", desc: "Ubicacion del asiento (seccion, fila, asientos). Hoy Deliveries solo tiene id, uuid, code, id_sale, id_user." },
+    { type: "Logica", name: "Sync OrderItem/DeliveryItem → SaleProduct.status", desc: "Al cambiar status de un OrderItem o DeliveryItem, actualizar el SaleProduct.status correspondiente (Pending → Sold/Redeemed → InProgress → Delivered)." },
+    { type: "Endpoint", name: "POST /promotions/validate", desc: "Validacion standalone de codigos promo. Hoy solo se validan al crear/importar codigos (ValidationsHelper.validatePromotionCode), no como operacion independiente." },
+    { type: "Auth", name: "Service-to-service auth para BM", desc: "Hoy la API usa JWT con Bearer token. Se necesita un mecanismo de autenticacion para llamadas server-to-server desde BM." },
+  ];
+
+  return (
+    <Card className="rounded-[28px] border-white/10 bg-white/5 text-white">
+      <CardHeader>
+        <CardTitle>Implementaciones necesarias en Yoshi</CardTitle>
+        <p className="text-sm text-slate-400">Cambios puntuales sobre la arquitectura existente</p>
+      </CardHeader>
+      <CardContent className="overflow-x-auto">
+        <table className="w-full text-xs">
+          <thead>
+            <tr className="border-b border-white/10 text-left text-[10px] uppercase tracking-wider text-slate-500">
+              <th className="pb-2 pr-3 font-semibold">Tipo</th>
+              <th className="pb-2 pr-3 font-semibold">Nombre</th>
+              <th className="pb-2 font-semibold">Justificacion</th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.map((item) => (
+              <tr key={item.name} className="border-b border-white/5">
+                <td className="py-2.5 pr-3 align-top">
+                  <span className="whitespace-nowrap rounded-full bg-white/10 px-2 py-0.5 text-[10px] text-slate-400">{item.type}</span>
+                </td>
+                <td className="py-2.5 pr-3 align-top font-medium text-white whitespace-nowrap">{item.name}</td>
+                <td className="py-2.5 align-top text-slate-400">{item.desc}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </CardContent>
+    </Card>
   );
 }
